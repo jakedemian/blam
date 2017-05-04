@@ -12,20 +12,22 @@ public class GrabberController : MonoBehaviour {
 	private Vector2 launchOppositeDir;
 
 	private bool isLaunched = false;
-	private float launchSpeed = 9f;
-	private float decelerationSpeed = 0.2f;
+	private float launchSpeed = 20f;
+	private float decelerationSpeed = 0.8f;
 
 	private bool isRebounding = false;
 	private float currentReboundSpeed = 0f;
-	private float MAX_REBOUND_SPEED = 8f;
+	private float MAX_REBOUND_SPEED = 15f;
 	private float reboundAcceleration = 0.6f;
+
+	private const float GRABBER_FINISHED_DIST = 0.3f;
 
 	private bool isHoldingObject = false;
 	private GameObject holdingObject;
 	
 	void FixedUpdate () {
 		if(isLaunched){
-			if(isRebounding){		
+			if(isRebounding){
 				Vector2 playerPos = player.transform.position;
 				Vector2 myPos = transform.position;
 				Vector2 diffs = playerPos - myPos;		
@@ -46,7 +48,7 @@ public class GrabberController : MonoBehaviour {
 				if(Vector2.Dot(launchOppositeDir, rb.velocity) > 0){
 					isRebounding = true;
 					rb.velocity = Vector2.zero;
-					getCollider2D().enabled = true;
+					//getCollider2D().enabled = true;
 				}
 			}
 		}
@@ -63,7 +65,22 @@ public class GrabberController : MonoBehaviour {
 			transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, 180f - (angleRads * Mathf.Rad2Deg));
 
 			drawGrabberToPlayerLine();
+
+			if(isRebounding 
+			&& getDistanceBetweenTwoPoints(transform.position, player.transform.position) <= GRABBER_FINISHED_DIST){
+				grabberFinished();
+			}
 		}
+	}
+
+	void grabberFinished(){
+		Debug.Log("grabber finished");
+
+		if(line != null) {
+			Destroy(line);
+		}
+
+		Destroy(gameObject);
 	}
 
 	void drawGrabberToPlayerLine(){
@@ -97,14 +114,8 @@ public class GrabberController : MonoBehaviour {
 		isLaunched = true;
 	}
 
-	void OnCollisionEnter2D(Collision2D c){
-		// TODO more stuff has to happen here
-
-		if(line != null) {
-			Destroy(line);
-		}
-		
-		Destroy(gameObject);
+	float getDistanceBetweenTwoPoints(Vector2 a, Vector2 b){
+		return Mathf.Sqrt(Mathf.Pow(a.x-b.x, 2) + Mathf.Pow(a.y-b.y, 2));
 	}
 
 
