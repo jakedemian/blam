@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour {
 
 	private int currentHealth = 5;
 
+	private float inactiveLinearDrag = 5f;
+	private float inactiveAngularDrag = 10f;
+
 	void Start () {
 		rb = GetComponent<Rigidbody2D>();
 		collider = GetComponent<BoxCollider2D>();
@@ -26,6 +29,7 @@ public class PlayerController : MonoBehaviour {
 
 	void Update(){
 		handlePlayerShoot();
+		updatePlayerDrag();
 		if(currentHealth <= 0){
 			Application.LoadLevel("main");
 		}
@@ -93,6 +97,11 @@ public class PlayerController : MonoBehaviour {
 		if(shotCooldownTimer > 0f){
 			shotCooldownTimer -= Time.deltaTime;
 		}
+	}
+
+	void updatePlayerDrag(){
+		rb.angularDrag = Input.GetAxisRaw("SpinCCW") == 0 && Input.GetAxisRaw("SpinCW") == 0 ? inactiveAngularDrag : 0f;
+		rb.drag = Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") == 0 ? inactiveLinearDrag : 0f;
 	}
 
 	void shrinkPlayer(){

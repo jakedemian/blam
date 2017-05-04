@@ -12,7 +12,7 @@ public class GrabberController : MonoBehaviour {
 	private Vector2 launchOppositeDir;
 
 	private bool isLaunched = false;
-	private float launchSpeed = 20f;
+	private float launchSpeed = 12f;
 	private float decelerationSpeed = 0.8f;
 
 	private bool isRebounding = false;
@@ -110,7 +110,7 @@ public class GrabberController : MonoBehaviour {
 		launchDirection = dir;
 		launchOppositeDir = -dir;
 
-		getRigidbody2D().AddForce(dir * launchSpeed, ForceMode2D.Impulse);
+		getRigidbody2D().AddForce((dir * launchSpeed) + player.GetComponent<Rigidbody2D>().velocity, ForceMode2D.Impulse);
 		isLaunched = true;
 	}
 
