@@ -7,12 +7,14 @@ public class BlobFragmentController : MonoBehaviour {
 	private Rigidbody2D parentRb;
 	private CircleCollider2D collider;
 	private GameObject parentBlob;
+	private GameObject grabber;
 
 	private float scale;
 	private float MAX_DISTANCE_FROM_PARENT_CENTER = 0.3f;
 
 	public bool drawDebugInfo = false;
 	private bool isEatable = false;
+	private bool isGrabbed = false;
 
 	public Sprite blackSprite;
 	public Sprite redSprite;
@@ -43,7 +45,12 @@ public class BlobFragmentController : MonoBehaviour {
 	*/
 	void Update () {
 		updateBlobFragmentColor();
-		boundBlobFragmentsToParent();
+
+		if(!isGrabbed){
+			boundBlobFragmentsToParent();
+		} else {
+			transform.position = grabber.transform.position;
+		}
 
 		if(drawDebugInfo){
 			doDrawDebugInfo();
@@ -56,6 +63,10 @@ public class BlobFragmentController : MonoBehaviour {
 	void OnCollisionEnter2D (Collision2D c) { 
 	    if (c.gameObject.tag == "PlayerShot") {
 	    	isEatable = true;
+	    } else if(c.gameObject.tag == "Grabber" && isEatable){
+	    	isGrabbed = true;
+	    	grabber = c.gameObject;
+	    	c.gameObject.GetComponent<GrabberController>().triggerGrabEvent(gameObject);
 	    }
 	}
 

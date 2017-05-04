@@ -10,23 +10,29 @@ public class PlayerController : MonoBehaviour {
 	public GameObject shotPrefab;
 	public GameObject grabberPrefab;
 
+	private int currentHealth = 5;
+
+
 	// CONSTANTS
 	public float MOVEMENT_SPEED_FACTOR = 10f;
 	public float TURN_SPEED_FACTOR = 2f;
 	public float MAX_TURN_SPEED = 150f;
 	public float MAX_MOVE_SPEED = 5f;
 	public float SHOT_COOLDOWN = 0.2f;
-
-	private int currentHealth = 5;
-
 	private float inactiveLinearDrag = 5f;
 	private float inactiveAngularDrag = 10f;
 
+	/**
+	 * START
+	 */
 	void Start () {
 		rb = GetComponent<Rigidbody2D>();
 		collider = GetComponent<BoxCollider2D>();
 	}
 
+	/**
+	 * UPDATE
+	 */
 	void Update(){
 		handlePlayerShoot();
 		updatePlayerDrag();
@@ -40,6 +46,9 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 	
+	/**
+	 * FIXED UPDATE
+	 */
 	void FixedUpdate () {
 		Vector2 movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 		rb.AddForce(movement * MOVEMENT_SPEED_FACTOR);
@@ -50,6 +59,9 @@ public class PlayerController : MonoBehaviour {
 		capTurnSpeed();
 	}
 
+	/**
+	 * Keep the magnitude of the player's move speed under the MAX_MOVE_SPEED limit.
+	 */
 	void capMoveSpeed(){
 		float currentMagnitude = getVelocityMagnitude();
 		if(currentMagnitude > MAX_MOVE_SPEED){
@@ -64,6 +76,9 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	/**
+	 * Keep the turn speed under MAX_TURN_SPEED
+	 */
 	void capTurnSpeed(){
 		if(rb.angularVelocity > MAX_TURN_SPEED){
 			rb.angularVelocity = MAX_TURN_SPEED;
@@ -72,6 +87,10 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	/**
+	 * Calculate the magnitude of the player's current velocity.
+	 * @return The magnitude of the player's current velocity.
+	 */
 	float getVelocityMagnitude(){
 		float x = rb.velocity.x;
 		float y = rb.velocity.y;
@@ -79,6 +98,9 @@ public class PlayerController : MonoBehaviour {
 		return Mathf.Sqrt((x*x) + (y*y));
 	}
 
+	/**
+	 * Handle the player shoot event.
+	 */
 	void handlePlayerShoot(){
 		if(Input.GetButtonDown("Shoot") && shotCooldownTimer <= 0f){
 			shotCooldownTimer = SHOT_COOLDOWN;
@@ -99,13 +121,26 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	/**
+	 * Update the player's angular and linear drag based on current user input.
+	 */
 	void updatePlayerDrag(){
 		rb.angularDrag = Input.GetAxisRaw("SpinCCW") == 0 && Input.GetAxisRaw("SpinCW") == 0 ? inactiveAngularDrag : 0f;
 		rb.drag = Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") == 0 ? inactiveLinearDrag : 0f;
 	}
 
-	void shrinkPlayer(){
+	/**
+	 * Shrink the player's size and decrement player health.
+	 */
+	public void shrinkPlayer(){
 		currentHealth--;
+
+		// TODO FIXME make shrink amount a constant
 		transform.localScale = transform.localScale * 0.85f;
+	}
+
+	public void growPlayer(){
+		currentHealth++;
+		transform.localScale = transform.localScale * 1.15f;
 	}
 }

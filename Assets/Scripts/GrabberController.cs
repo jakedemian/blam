@@ -25,6 +25,9 @@ public class GrabberController : MonoBehaviour {
 	private bool isHoldingObject = false;
 	private GameObject holdingObject;
 	
+	/**
+	 * FIXED UPDATE
+	 */
 	void FixedUpdate () {
 		if(isLaunched){
 			if(isRebounding){
@@ -48,12 +51,14 @@ public class GrabberController : MonoBehaviour {
 				if(Vector2.Dot(launchOppositeDir, rb.velocity) > 0){
 					isRebounding = true;
 					rb.velocity = Vector2.zero;
-					//getCollider2D().enabled = true;
 				}
 			}
 		}
 	}
 
+	/**
+	 * UPDATE
+	 */
 	void Update(){
 		if(isLaunched){
 			Vector2 playerPos = player.transform.position;
@@ -73,16 +78,25 @@ public class GrabberController : MonoBehaviour {
 		}
 	}
 
+	/**
+	 * Handles work to be done when the grabber gets back to the player.
+	 */
 	void grabberFinished(){
-		Debug.Log("grabber finished");
-
 		if(line != null) {
 			Destroy(line);
+		}
+
+		if(isHoldingObject){
+			Destroy(holdingObject);
+			player.GetComponent<PlayerController>().growPlayer();
 		}
 
 		Destroy(gameObject);
 	}
 
+	/**
+	 * Draws the connecting line between the player and the grabber.
+	 */
 	void drawGrabberToPlayerLine(){
 		if(line != null) {
 			Destroy(line);
@@ -104,6 +118,9 @@ public class GrabberController : MonoBehaviour {
 
 	/**
 		Launch the grabber in the direction dir.
+
+		@param dir 			The direction to launch the grabber.
+		@param playerObj 	The player gameObject.
 	*/
 	public void launch(Vector2 dir, GameObject playerObj){
 		player = playerObj;
@@ -114,15 +131,27 @@ public class GrabberController : MonoBehaviour {
 		isLaunched = true;
 	}
 
+	public void triggerGrabEvent(GameObject objGrabbed){
+		isHoldingObject = true;
+		getCollider2D().enabled = false;
+		holdingObject = objGrabbed;
+	}
+
+	/**
+	 * Obtain the distance between two points.
+	 * 
+	 * @param  a The first point.
+	 * @param  b The second point.
+	 * @return The distance between a and b.
+	 */
 	float getDistanceBetweenTwoPoints(Vector2 a, Vector2 b){
 		return Mathf.Sqrt(Mathf.Pow(a.x-b.x, 2) + Mathf.Pow(a.y-b.y, 2));
 	}
 
-
-
-	//////////////////////////////////
-	// ACCESSORS
-
+	/**
+	 * Get this object's rigidbody, lazy load if needed.
+	 * @return The rigidbody attached to the grabber.
+	 */
 	public Rigidbody2D getRigidbody2D(){
 		if(rb == null){
 			rb = GetComponent<Rigidbody2D>();
@@ -130,6 +159,10 @@ public class GrabberController : MonoBehaviour {
 		return rb;
 	}
 
+	/**
+	 * Get this object's rigidbody, lazy load if needed.
+	 * @return The collider attached to this object
+	 */
 	public Collider2D getCollider2D(){
 		if(collider == null){
 			collider = GetComponent<Collider2D>();
