@@ -4,13 +4,18 @@ using UnityEngine;
 
 public class BlobController : MonoBehaviour {
 	private Rigidbody2D rb;
-	public GameObject blobFragmentPrefab;
 	private GameObject player;
+
+	public GameObject blobFragmentPrefab;
 
 	private List<GameObject> blobFragments;
 	private int blobFragmentLayer = 8;
+	private float moveSpeed = 1f;
+	private float boundsOffsetFactor = 0.05f;
 
-	// Use this for initialization
+	/**
+	 * START
+	 */
 	void Start () {
 		rb = GetComponent<Rigidbody2D>();
 		blobFragments = new List<GameObject>();
@@ -24,18 +29,72 @@ public class BlobController : MonoBehaviour {
 			blobFragments[i].transform.parent = gameObject.transform;
 		}
 
-		player = GameObject.FindGameObjectsWithTag("Player")[0];
-
-		Vector2 myPos = transform.position;
-		Vector2 playerPos = player.transform.position;
-
-		Vector2 moveToPlayerVector = new Vector2(playerPos.x - myPos.x, playerPos.y - myPos.y);
-
-		rb.velocity = moveToPlayerVector * 0.05f;
+		rb.velocity = Random.insideUnitCircle * moveSpeed;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	void Update(){
+		boundBlobToCameraView();
+
+		updateChildFragmentState();
+	}
+
+	/**
+		Make blob stay within camera view.
+	*/
+	void boundBlobToCameraView(){
+		float x = transform.position.x;
+		float y = transform.position.y;
+
+		float xVel = rb.velocity.x;
+		float yVel = rb.velocity.y;
+
+		Vector2 camMinPoint = new Vector2(0f + (Screen.width * boundsOffsetFactor), 0f + (Screen.height * boundsOffsetFactor));
+		Vector2 camMaxPoint = new Vector2(Screen.width - (Screen.width * boundsOffsetFactor), Screen.height - (Screen.height * boundsOffsetFactor));
+
+		Vector2 min = Camera.main.ScreenToWorldPoint(camMinPoint);
+		Vector2 max = Camera.main.ScreenToWorldPoint(camMaxPoint);
+
+		if(x > max.x || x < min.x){
+			xVel = -xVel;
+			reverseChildFragmentHorizVelocity();
+		}
+
+		if(y > max.y || y < min.y){
+			yVel = -yVel;
+			reverseChildFragmentVerticalVelocity();
+		}
+
+		rb.velocity = new Vector2(xVel, yVel);
+	}
+
+	void reverseChildFragmentHorizVelocity(){
+		for(int i = 0; i < blobFragments.Count; i++){
+			if(blobFragments[i] != null){
+				Rigidbody2D childRb = blobFragments[i].GetComponent<Rigidbody2D>();
+				childRb.velocity = new Vector2(-childRb.velocity.x, childRb.velocity.y);
+			}
+		}
+	}
+
+	void reverseChildFragmentVerticalVelocity(){
+		for(int i = 0; i < blobFragments.Count; i++){
+			if(blobFragments[i] != null){
+				Rigidbody2D childRb = blobFragments[i].GetComponent<Rigidbody2D>();
+				childRb.velocity = new Vector2(childRb.velocity.x, -childRb.velocity.y);
+			}
+		}
+	}
+
+	void updateChildFragmentState(){
+		for(int i = 0; i < blobFragments.Count; i++){
+			if(blobFragments[i] == null){
+				blobFragments.RemoveAt(i);
+				i--;
+			}
+		}
+
+		if(blobFragments.Count == 0){
+			Destroy(gameObject);
+		}
 	}
 }

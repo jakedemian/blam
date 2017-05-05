@@ -131,6 +131,10 @@ public class GrabberController : MonoBehaviour {
 		isLaunched = true;
 	}
 
+	/**
+	 * Method that is called when a blob fragment detects that it has been grabbed.
+	 * @param  objGrabbed	The gameObject that was grabbed.
+	 */
 	public void triggerGrabEvent(GameObject objGrabbed){
 		isHoldingObject = true;
 		getCollider2D().enabled = false;
