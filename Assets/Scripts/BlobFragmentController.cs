@@ -19,6 +19,7 @@ public class BlobFragmentController : MonoBehaviour {
 	public Sprite blackSprite;
 	public Sprite redSprite;
 
+
 	/**
 		START
 	*/

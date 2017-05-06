@@ -27,6 +27,7 @@ public class BlobController : MonoBehaviour {
 				ObjectPoolController.InstantiateFromPool(blobFragmentPrefab, transform.position, transform.rotation)
 			);
 			blobFragments[i].transform.parent = gameObject.transform;
+			blobFragments[i].transform.Rotate(0.0f, 0.0f, Random.Range(0.0f, 360.0f));
 		}
 
 		rb.velocity = Random.insideUnitCircle * moveSpeed;

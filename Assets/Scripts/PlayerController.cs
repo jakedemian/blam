@@ -50,9 +50,20 @@ public class PlayerController : MonoBehaviour {
 	 * FIXED UPDATE
 	 */
 	void FixedUpdate () {
-		Vector2 movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-		rb.AddForce(movement * MOVEMENT_SPEED_FACTOR);
-		capMoveSpeed();
+		Vector2 inputDir = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+		if(inputDir.x != 0f || inputDir.y != 0f){
+			// float angle = Vector2.Angle(transform.up, inputDir);
+			// angle = inputDir.y < 0 ? -angle : angle;
+			// angle = angle + 180f;
+			// Debug.Log(angle);
+			// if(Mathf.Abs(angle) > 1f){
+			// 	transform.Rotate(Vector3.forward, 5f * Mathf.Sign(angle));
+			// }
+
+			rb.AddForce(inputDir * MOVEMENT_SPEED_FACTOR);
+			capMoveSpeed();
+		}
 
 		float spin = Input.GetAxisRaw("SpinCCW") - Input.GetAxisRaw("SpinCW");
 		rb.AddTorque(spin * TURN_SPEED_FACTOR);
@@ -112,6 +123,10 @@ public class PlayerController : MonoBehaviour {
 			
 				GameObject go = ObjectPoolController.InstantiateFromPool(shotPrefab, spawnLocation, transform.rotation);
 				go.GetComponent<Rigidbody2D>().velocity = /*new Vector3(rb.velocity.x, rb.velocity.y, 0f) +*/ (directions[i] * 1f);
+
+				if(directions[i] == transform.right || directions[i] == -transform.right){
+					go.transform.Rotate(new Vector3(0f, 0f, 90f));
+				}
 			}
 
 			shrinkPlayer();	
