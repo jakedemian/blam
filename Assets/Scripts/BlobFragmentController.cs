@@ -50,7 +50,9 @@ public class BlobFragmentController : MonoBehaviour {
 		if(!isGrabbed){
 			boundBlobFragmentsToParent();
 		} else {
-			transform.position = grabber.transform.position;
+			if(grabber != null){
+				transform.position = grabber.transform.position;
+			}
 		}
 
 		if(drawDebugInfo){

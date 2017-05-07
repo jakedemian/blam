@@ -45,12 +45,15 @@ public class GameController : MonoBehaviour {
 	bool isLevelComplete(){
 		bool levelComplete = true;
 
+		int activeEnemies = 0;
 		for(int i = 0; i < blobs.Count; i++){
 			if(blobs[i] != null){
 				levelComplete = false;
-				break;
+				activeEnemies++;
 			}
 		}
+
+		Debug.Log(activeEnemies);
 
 		return levelComplete;
 	}
